@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "gemini&langchain"
+version = "0.1.0"
+description = ""
+authors = vinicius.silveira.campos@gmail.com
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langchain-google-genai = "^2.1.7"
+dotenv = "^0.9.9"
+langgraph = "^0.5.2"
+ipython = "^9.4.0"
+discord = "^2.3.2"
+flask = "^3.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

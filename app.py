@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import AIMessage
 
+import agent
 
 load_dotenv()
 
@@ -15,23 +16,6 @@ intents.message_content = True
 intents.messages = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
-
-
-messages = [
-    (
-        "system",
-        "You are Mentionary, an AI on the discord platform, created to help, play and answer questions from server members.",
-    )
-]
-
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=0,
-    max_tokens=4 * 1024,
-    timeout=None,
-    max_retries=2,
-)
 
 
 @bot.event
@@ -46,31 +30,36 @@ async def on_message(message):
 
     if bot.user in message.mentions:
         if message.reference:
-            try:
-
-                ref_msg = await message.channel.fetch_message(
-                    message.reference.message_id
+            ref_msg = await message.channel.fetch_message(message.reference.message_id)
+            mention = (
+                "mention_message",
+                {ref_msg.author.name: ref_msg.content},
+            )
+            messages_to_send = [
+                (
+                    "human",
+                    f" {mention} \n {message.author.name}:{message.content}",
                 )
-                if ref_msg:
-                    mention = (
-                        "mention_message",
-                        {ref_msg.author.name: ref_msg.content},
-                    )
-                    messages.append(
-                        (
-                            "human",
-                            f" {mention} \n {message.author.name}:{message.content}",
-                        )
-                    )
+            ]
+        else:
+            messages_to_send = [("human", f"{message.author.name}: {message.content}")]
 
-                    response = llm.invoke(messages)
+        inputs = {"messages": messages_to_send}
+        async for event in agent.graph.astream(
+            inputs, stream_mode="values", config=agent.config
+        ):
+            response = event["messages"][-1]
+            if response.id in agent.ids:
+                continue
 
-                    print(messages)
-
-            except Exception as e:
-                print(e)
-
-        await message.channel.send(response.content)
+            agent.ids.add(response.id)
+            match response:
+                case AIMessage(content=str() as text) | AIMessage(
+                    content=[{"text": text, "type": "text"}, *_]
+                ):
+                    await message.channel.send(text)
+                case _:
+                    pass
 
     await bot.process_commands(message)
 

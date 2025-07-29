@@ -3,7 +3,7 @@ name: Terraform Resource Check
 on:
   push:
     paths:
-      - '**.tf'
+      - '**/*.tf'
   workflow_dispatch:
 
 jobs:

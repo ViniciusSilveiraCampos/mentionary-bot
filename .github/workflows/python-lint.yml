@@ -1,6 +1,9 @@
-name: Python Lint
+name: Lint
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ["main"]
+  pull_request:
 
 jobs:
   lint:
@@ -10,14 +13,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install uv
-        run: pip install uv
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Sync dependencies
-        run: uv sync --dev
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+
+      - name: Cache Poetry virtualenvs
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: poetry install
 
       - name: Run Ruff
-        run: uv run ruff check .
+        run: poetry run ruff check .
 
       - name: Run Black
-        run: uv run black --check .
+        run: poetry run black --check .

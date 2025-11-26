@@ -1,11 +1,12 @@
+import base64
+import io
+import os
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-import os
 from langchain_core.messages import AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-import base64
-import io
 
 import agent
 

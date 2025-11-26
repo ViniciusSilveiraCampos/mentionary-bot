@@ -2,7 +2,7 @@
 name = "gemini&langchain"
 version = "0.1.0"
 description = ""
-authors = vinicius.silveira.campos@gmail.com
+authors = ['vinicius.silveira.campos@gmail.com']
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -18,3 +18,26 @@ flask = "^3.1.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+exclude = ["venv", "__pycache__"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",  # flake8
+    "I",            # import order
+]
+
+ignore = [
+    "E501", # linha longa (Black corrige)
+]
+
+[tool.ruff.format]
+quote-style = "double"

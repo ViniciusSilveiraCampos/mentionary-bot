@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gemini&langchain"
+name = "gemini-langchain"
 version = "0.1.0"
 description = ""
 authors = ['vinicius.silveira.campos@gmail.com']
